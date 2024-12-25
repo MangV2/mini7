@@ -185,8 +185,9 @@
     <div class="form-group">
       <label>유형</label>
       <div class="radio-group">
-        <label>
-          <input type="radio" id="post-type-notice" name="post_type" value="공지사항" th:checked="${board.post_type == '공지사항'}" required />
+        <label th:if="${session.user != null and session.user.idType == 1}">
+          <input type="radio" id="post-type-notice" name="post_type" value="공지사항"
+                 th:checked="${board.post_type == '공지사항'}" required />
           공지사항
         </label>
         <label>

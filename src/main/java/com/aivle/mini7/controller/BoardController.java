@@ -25,38 +25,10 @@ public class BoardController {
             return "redirect:/login";
         }
 
-        // 관리자인 경우 관리자 전용 페이지로 리다이렉트
-        if (user.getIdType() == 1) {
-            return "redirect:/board/admin";
-        }
-
-        // 일반 사용자 게시판 목록
-        if (user.getIdType() == 0) {
-            model.addAttribute("boardList", boardService.getBoardList());
-            return "board/list";
-        }
-
-        // 예외적인 경우 권한 없음 페이지로 연결
-        return "error/unauthorized";
-    }
-
-    @GetMapping("/admin")
-    public String getAdminBoard(HttpSession session, Model model) {
-        User user = (User) session.getAttribute("user");
-
-        // 로그인하지 않은 경우 로그인 페이지로 리다이렉트
-        if (user == null) {
-            return "redirect:/login";
-        }
-
-        // 관리자인 경우만 접근 허용
-        if (user.getIdType() == 1) {
-            model.addAttribute("boardList", boardService.getBoardList()); // 관리자도 게시판 목록을 볼 수 있음
-            return "board/admin";
-        }
-
-        // 일반 사용자는 접근 불가
-        return "error/unauthorized";
+        // 사용자 유형(관리자 또는 일반 사용자)을 전달
+        model.addAttribute("userType", user.getIdType());
+        model.addAttribute("boardList", boardService.getBoardList());
+        return "board/list";
     }
 
     @GetMapping("/{id}")
@@ -68,14 +40,9 @@ public class BoardController {
             return "redirect:/login";
         }
 
-        // 일반 사용자와 관리자는 게시글 상세 보기 허용
-        if (user.getIdType() == 0 || user.getIdType() == 1) {
-            model.addAttribute("board", boardService.getBoardById(id));
-            return "board/detail";
-        }
-
-        // 예외적인 경우 권한 없음 페이지로 연결
-        return "error/unauthorized";
+        // 게시글 상세 보기
+        model.addAttribute("board", boardService.getBoardById(id));
+        return "board/detail";
     }
 
     @GetMapping("/form")
@@ -87,18 +54,14 @@ public class BoardController {
             return "redirect:/login";
         }
 
-        // 일반 사용자와 관리자는 글 작성 가능
-        if (user.getIdType() == 0 || user.getIdType() == 1) {
-            model.addAttribute("board", new BoardDto());
-            return "board/form";
-        }
-
-        // 예외적인 경우 권한 없음 페이지로 연결
-        return "error/unauthorized";
+        // 사용자 유형을 전달 (관리자 여부 확인용)
+        model.addAttribute("userType", user.getIdType());
+        model.addAttribute("board", new BoardDto());
+        return "board/form";
     }
 
     @PostMapping
-    public String saveBoard(@ModelAttribute BoardDto boardDto, HttpSession session) {
+    public String saveBoard(@ModelAttribute BoardDto boardDto, HttpSession session, Model model) {
         User user = (User) session.getAttribute("user");
 
         // 로그인하지 않은 경우 로그인 페이지로 리다이렉트
@@ -106,13 +69,13 @@ public class BoardController {
             return "redirect:/login";
         }
 
-        // 일반 사용자와 관리자는 게시글 저장 가능
-        if (user.getIdType() == 0 || user.getIdType() == 1) {
-            boardService.createBoard(boardDto);
-            return "redirect:/board";
+        // 공지사항 작성 권한 제한
+        if ("공지사항".equals(boardDto.getPost_type()) && user.getIdType() != 1) {
+            model.addAttribute("error", "관리자만 공지사항을 작성할 수 있습니다.");
+            return "board/form";
         }
 
-        // 예외적인 경우 권한 없음 페이지로 연결
-        return "error/unauthorized";
+        boardService.createBoard(boardDto);
+        return "redirect:/board";
     }
 }
