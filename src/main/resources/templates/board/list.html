@@ -284,18 +284,14 @@
   <div class="table-container">
     <table>
       <tbody>
-      <tr th:each="item : ${boardList}">
-        <!-- 글 번호 -->
-        <td th:text="${item.index}"></td>
-        <!-- 글 유형 -->
+      <tr th:each="item, stat : ${boardList}">
+        <!-- 동적으로 번호 생성 -->
+        <td th:text="${stat.index + 1}"></td>
         <td th:text="${item.board.post_type}"></td>
-        <!-- 글 제목 -->
         <td>
           <a th:href="@{/board/{id}(id=${item.board.board_id})}" th:text="${item.board.title}"></a>
         </td>
-        <!-- 작성자 -->
         <td th:text="${item.board.author_id}"></td>
-        <!-- 작성일 -->
         <td th:text="${item.board.created_time}"></td>
       </tr>
       </tbody>

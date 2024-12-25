@@ -81,7 +81,7 @@ public class BoardController {
         return "redirect:/board";
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{id}/delete")
     public String deleteBoard(@PathVariable Long id, HttpSession session, Model model) {
         User user = (User) session.getAttribute("user");
 
@@ -97,8 +97,11 @@ public class BoardController {
         }
 
         boardService.deleteBoard(id);
+
+        // 삭제 후 게시글 목록으로 리다이렉트
         return "redirect:/board";
     }
+
 
     @GetMapping("/{id}/edit")
     public String editBoard(@PathVariable Long id, HttpSession session, Model model) {

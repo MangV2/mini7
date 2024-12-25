@@ -57,8 +57,12 @@ public class BoardService {
                 .build();
     }
     public void deleteBoard(Long board_id) {
+        if (!boardRepository.existsById(board_id)) {
+            throw new RuntimeException("삭제하려는 게시글이 존재하지 않습니다.");
+        }
         boardRepository.deleteById(board_id);
     }
+
 
 
     public void updateBoard(Long id, BoardDto boardDto) {
