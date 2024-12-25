@@ -129,17 +129,29 @@
 <div th:replace="fragments/nav :: nav"></div>
 
 <div class="post-container">
-    <!-- 서버에서 Thymeleaf로 데이터를 렌더링 -->
     <h2>
-        <small th:text="'[' + ${board.post_type} + ']'">[유형]</small>
-        <span th:text="${board.title}" style="font-weight: bold;">게시글 제목</span>
+        <small th:text="'[' + ${board.post_type} + ']'"></small>
+        <span th:text="${board.title}" style="font-weight: bold;"></span>
     </h2>
     <div class="post-meta">
-        <span>작성자: <span th:text="${board.author_id}">작성자 이름</span></span>
-        <span>작성일: <span th:text="${board.created_time}">2024-12-24</span></span>
+        <span>작성자: <span th:text="${board.author_id}"></span></span>
+        <span>작성일: <span th:text="${board.created_time}"></span></span>
     </div>
-    <p th:text="${board.content}">게시글 내용</p>
-    <a th:href="@{/board}" class="back-link">목록으로 돌아가기</a>
+    <p th:text="${board.content}"></p>
+
+    <!-- 삭제 및 수정 버튼 -->
+    <div class="button-group" th:if="${session.user != null}">
+        <!-- 관리자 또는 작성자만 버튼 표시 -->
+        <a th:if="${session.user.idType == 1 or session.user.id == board.author_id}"
+           th:href="@{/board/{id}/edit(id=${board.board_id})}" class="btn btn-primary">수정</a>
+        <form th:if="${session.user.idType == 1 or session.user.id == board.author_id}"
+              th:action="@{/board/{id}/delete(id=${board.board_id})}" method="post" style="display:inline;">
+            <input type="hidden" name="_method" value="delete">
+            <button type="submit" class="btn btn-danger">삭제</button>
+        </form>
+    </div>
+
+    <a th:href="@{/board}" class="btn btn-secondary">목록으로 돌아가기</a>
 </div>
 
 <!-- 클라이언트에서 데이터를 동적으로 로드하는 경우 -->

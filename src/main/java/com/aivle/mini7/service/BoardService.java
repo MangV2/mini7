@@ -56,6 +56,24 @@ public class BoardService {
                 .post_type(dto.getPost_type())
                 .build();
     }
+    public void deleteBoard(Long board_id) {
+        boardRepository.deleteById(board_id);
+    }
+
+
+    public void updateBoard(Long id, BoardDto boardDto) {
+        Board board = boardRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
+
+        // 기존 데이터를 업데이트
+        board.setTitle(boardDto.getTitle());
+        board.setContent(boardDto.getContent());
+        board.setPost_type(boardDto.getPost_type());
+        boardRepository.save(board);
+    }
+
+
+
 
     private String getCurrentTime() {
         return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());

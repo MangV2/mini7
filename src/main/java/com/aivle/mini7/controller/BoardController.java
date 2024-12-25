@@ -80,4 +80,65 @@ public class BoardController {
         boardService.createBoard(boardDto);
         return "redirect:/board";
     }
+
+    @DeleteMapping("/{id}")
+    public String deleteBoard(@PathVariable Long id, HttpSession session, Model model) {
+        User user = (User) session.getAttribute("user");
+
+        if (user == null) {
+            return "redirect:/login";
+        }
+
+        // 권한 확인: 관리자 또는 작성자만 삭제 가능
+        BoardDto board = boardService.getBoardById(id);
+        if (user.getIdType() != 1 && !board.getAuthor_id().equals(user.getId())) {
+            model.addAttribute("error", "삭제 권한이 없습니다.");
+            return "error/unauthorized";
+        }
+
+        boardService.deleteBoard(id);
+        return "redirect:/board";
+    }
+
+    @GetMapping("/{id}/edit")
+    public String editBoard(@PathVariable Long id, HttpSession session, Model model) {
+        User user = (User) session.getAttribute("user");
+
+        if (user == null) {
+            return "redirect:/login";
+        }
+
+        // 권한 확인: 관리자 또는 작성자만 수정 가능
+        BoardDto board = boardService.getBoardById(id);
+        if (user.getIdType() != 1 && !board.getAuthor_id().equals(user.getId())) {
+            model.addAttribute("error", "수정 권한이 없습니다.");
+            return "error/unauthorized";
+        }
+
+        model.addAttribute("board", board);
+        model.addAttribute("userType", user.getIdType());
+        return "board/form"; // 수정 폼으로 이동
+    }
+
+    @PostMapping("/{id}")
+    public String updateBoard(@PathVariable Long id, @ModelAttribute BoardDto boardDto, HttpSession session, Model model) {
+        User user = (User) session.getAttribute("user");
+
+        if (user == null) {
+            return "redirect:/login";
+        }
+
+        // 권한 확인: 관리자 또는 작성자만 수정 가능
+        BoardDto existingBoard = boardService.getBoardById(id);
+        if (user.getIdType() != 1 && !existingBoard.getAuthor_id().equals(user.getId())) {
+            model.addAttribute("error", "수정 권한이 없습니다.");
+            return "error/unauthorized";
+        }
+
+        // 기존 게시글 업데이트
+        boardService.updateBoard(id, boardDto);
+        return "redirect:/board";
+    }
+
+
 }
