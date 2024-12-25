@@ -283,19 +283,20 @@
   <!-- 게시글 목록 테이블 -->
   <div class="table-container">
     <table>
-<!--      <thead>-->
-<!--        <div th:replace="fragments/nav :: nav"></div>-->
-<!--      </thead>-->
-      <tbody id="board-list">
-      <!-- Thymeleaf를 통한 기본 렌더링 -->
-      <tr th:each="board : ${boardList}">
-        <td th:text="${board.board_id}"></td>
-        <td th:text="${board.post_type}"></td>
+      <tbody>
+      <tr th:each="item : ${boardList}">
+        <!-- 글 번호 -->
+        <td th:text="${item.index}"></td>
+        <!-- 글 유형 -->
+        <td th:text="${item.board.post_type}"></td>
+        <!-- 글 제목 -->
         <td>
-          <a th:href="@{/board/{id}(id=${board.board_id})}" th:text="${board.title}"></a>
+          <a th:href="@{/board/{id}(id=${item.board.board_id})}" th:text="${item.board.title}"></a>
         </td>
-        <td th:text="${board.author_id}"></td>
-        <td th:text="${board.created_time}"></td>
+        <!-- 작성자 -->
+        <td th:text="${item.board.author_id}"></td>
+        <!-- 작성일 -->
+        <td th:text="${item.board.created_time}"></td>
       </tr>
       </tbody>
     </table>

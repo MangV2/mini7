@@ -20,16 +20,15 @@ public class BoardController {
     public String getBoardList(HttpSession session, Model model) {
         User user = (User) session.getAttribute("user");
 
-        // 로그인하지 않은 경우 로그인 페이지로 리다이렉트
         if (user == null) {
             return "redirect:/login";
         }
 
-        // 사용자 유형(관리자 또는 일반 사용자)을 전달
         model.addAttribute("userType", user.getIdType());
-        model.addAttribute("boardList", boardService.getBoardList());
+        model.addAttribute("boardList", boardService.getBoardListWithIndex());
         return "board/list";
     }
+
 
     @GetMapping("/{id}")
     public String getBoardDetail(@PathVariable Long id, HttpSession session, Model model) {
@@ -68,6 +67,9 @@ public class BoardController {
         if (user == null) {
             return "redirect:/login";
         }
+
+        // 작성자를 로그인 사용자로 설정
+        boardDto.setAuthor_id(user.getId());
 
         // 공지사항 작성 권한 제한
         if ("공지사항".equals(boardDto.getPost_type()) && user.getIdType() != 1) {

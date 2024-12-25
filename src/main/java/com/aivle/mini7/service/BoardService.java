@@ -7,8 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,6 +32,20 @@ public class BoardService {
         return boardRepository.findById(board_id)
                 .map(BoardDto::new)
                 .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
+    }
+    public List<Map<String, Object>> getBoardListWithIndex() {
+        List<BoardDto> boardList = getBoardList();
+        List<Map<String, Object>> boardListWithIndex = new ArrayList<>();
+
+        for (int i = 0; i < boardList.size(); i++) {
+            BoardDto board = boardList.get(i);
+            Map<String, Object> boardWithIndex = new HashMap<>();
+            boardWithIndex.put("index", i + 1); // 1부터 시작하는 번호
+            boardWithIndex.put("board", board);
+            boardListWithIndex.add(boardWithIndex);
+        }
+
+        return boardListWithIndex;
     }
 
     private Board toEntity(BoardDto dto) {
